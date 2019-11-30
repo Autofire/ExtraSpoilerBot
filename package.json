@@ -8,9 +8,5 @@
   "dependencies": {
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "winston": "^3.2.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:Autofire/ExtraSpoilerBot.git"
   }
 }
