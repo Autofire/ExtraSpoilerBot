@@ -1,0 +1,16 @@
+{
+  "name": "extra-spoiler-bot",
+  "version": "1.0.0",
+  "description": "A simple Discord bot that automates posting images as spoilers.",
+  "main": "bot.js",
+  "author": "Autofire",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+    "winston": "^3.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Autofire/ExtraSpoilerBot.git"
+  }
+}
