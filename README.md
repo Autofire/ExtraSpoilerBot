@@ -8,6 +8,8 @@ Discord bot, get your own auth key, and then put that in your auth.json.
 
 The auth.json should look like this:
 
-```{
+```
+{
 "token": "0123456679...1093409458"
-}```
+}
+```
