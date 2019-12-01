@@ -5,6 +5,7 @@ var rp = require('request-promise');
 var fs = require(`fs`);
 
 const authorID = '161610625808596994';
+const tmpDir = './tmp';
 
 
 // Configure logger settings
@@ -24,8 +25,28 @@ function download(url, name, successCallback){
 		.on('close', successCallback);
 }
 
+function safelyDeleteFile(fname) {
+
+	try {
+		if(fs.existsSync(fname)) {
+			fs.unlink(fname, () => { 
+				logger.info(`Deleted ${fname}`)
+			});
+		}
+	}
+	catch(ex) {
+		logger.error(ex);
+		logger.error(`Failed to delete ${fname}`);
+	}
+}
+
 // Configure bot
 const bot = new Discord.Client();
+
+if(!fs.existsSync(tmpDir)) {
+	logger.info("Temporary directory is missing; creating one...");
+	fs.mkdirSync(tmpDir);
+}
 
 bot.once('ready', () => {
     logger.info('Connected');
@@ -49,19 +70,31 @@ bot.on("message", async message => {
         switch(cmd) {
             // !ping
             case 'goose':
-				message.channel.send(message.attachments.array().length);
+				message.channel.send("Honk!");
             	break;
 
+			case 'cw':
 			case 'spoil':
+				logger.info(' ');
+				logger.info(`${fullAuthor} has made a request`);
+
 				if(message.attachments.array().length === 0) {
 					message.channel.send(
 						"Attach something to your message, " +
 						"and then I'll reupload it as a spoiler. " +
 						"Also please let everyone know why it's a spoiler " +
-						"by providing a brief explanation with your image."
+						"by providing a brief explanation with your image. " +
+						"If you are trying to post a text spoiler, " +
+						"please wrap it in vertical bars.\n\n" +
+
+						"For example, `||spoiler text||`, yields ||spoiler text||."
 					);
 
 					logger.info(`${fullAuthor} printed out usage information`);
+					logger.info(`${fullAuthor}'s message was '${message.content}'`);
+
+					message.delete();
+					logger.info(`Deleted original message`);
 				}
 				else if(message.attachments.array().length > 1) {
 					message.channel.send(
@@ -71,34 +104,70 @@ bot.on("message", async message => {
 					);
 
 					logger.info(`${fullAuthor} uploaded too many attachments`);
+
+					message.delete();
+					logger.info(`Deleted original message`);
 				}
 				else {
 
-					let uploadMessage = `<@${message.author.id}> posts a spoiler: ${description}`;
+					let uploadMessage = '';
+					if(cmd === 'spoil') {
+						uploadMessage = `<@${message.author.id}> posts a spoiler: ${description}`;
+					}
+					else {
+						uploadMessage =
+							`<@${message.author.id}> posts something ` +
+							`with a content warning: ${description}`;
+					}
 
 					let a = message.attachments.first();
-					let fname = 'SPOILER_' + a.filename;
+					let fname = `${tmpDir}/SPOILER_${a.filename}`;
 
-					download(a.proxyURL, fname, (resp) => {
-						message.channel.send(uploadMessage, {files: [`./${fname}`]})
-							.then(() => {
-								fs.unlink(fname, () => { 
-									logger.info(`Deleted ${fname}`)
+					logger.info(`${fullAuthor} has sent in a file: `);
+					logger.info(` id: ${a.id}`);
+					logger.info(` filesize: ${a.filesize}`);
+					logger.info(` url: ${a.url}`);
+					logger.info(` proxyURL: ${a.proxyURL}`);
+
+					try {
+						download(a.url, fname, (resp) => {
+							logger.info(`Downloaded as ${fname}`);
+							message.channel.send(uploadMessage, {files: [`./${fname}`]})
+								.then(() => {
+									logger.info(`Uploaded ${fname}`);
+									safelyDeleteFile(fname);
+								})
+								.catch((ex) => {
+									logger.error(ex);
+									logger.error("Upload failed!");
+
+									safelyDeleteFile(fname);
 								});
-							});
+
+							// We can only delete the message once we
+							// successfully download the file.
+							message.delete();
+							logger.info(`Deleted original message`);
+						});
+					}
+					catch(ex) {
+						logger.error(ex);
+						logger.error("Download failed!");
+
 						message.delete();
-					});
+						logger.info(`Deleted original message`);
+
+						safelyDeleteFile(fname);
+					}
+					// We cannot move safelyDeleteFile into a finally block
+					// because, during normal execution, we mustn't delete it
+					// until the upload fully succeeds.
 
 				}
-
-
-				//message.delete();
-
 				break;
 
-            // Just add any case commands if you want to..
-         }
-     }
-});
+		} // switch(cmd)
+	} // if(message.content.substring(0, 1) == '!')
+}); // bot.on("message", ...
 
 bot.login(auth.token);
