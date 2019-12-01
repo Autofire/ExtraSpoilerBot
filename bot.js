@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 var logger = require('winston');
 var auth = require('./auth.json');
+var rp = require('request-promise');
+var fs = require(`fs`);
 
 const authorID = '161610625808596994';
 
@@ -14,8 +16,6 @@ logger.level = 'debug';
 
 // Stuff for downloading
 //let request = require(`request`);
-var rp = require('request-promise');
-var fs = require(`fs`);
 function download(url, name, successCallback){
 
     rp.get(url)
@@ -36,9 +36,14 @@ bot.once('ready', () => {
 bot.on("message", async message => {
 
     if (message.content.substring(0, 1) == '!') {
-        var args = message.content.substring(1).split(' ');
-        var cmd = args[0];
-		var fullAuthor = `${message.author.tag} (ID ${message.author.id})`;
+        let args = message.content.substring(1).split(' ');
+        let cmd = args[0];
+		args.shift();
+		let description = args.join(' ');
+		if(description === '') {
+			description = "[No description given]";
+		}
+		let fullAuthor = `${message.author.tag} (ID ${message.author.id})`;
        
         args = args.splice(1);
         switch(cmd) {
@@ -69,18 +74,21 @@ bot.on("message", async message => {
 				}
 				else {
 
-					message.attachments.forEach(a => {
-						//message.channel.send('Capturing ' + a.filename);
-						//fs.writeFile(`./${a.filename}`, a.proxyURL);
+					let uploadMessage = `<@${message.author.id}> posts a spoiler: ${description}`;
 
-						let fname = 'SPOILER_' + a.filename;
+					let a = message.attachments.first();
+					let fname = 'SPOILER_' + a.filename;
 
-						download(a.proxyURL, fname, (resp) => {
-							message.channel.send('Re-uploading...', {files: [`./${fname}`]});
-							message.delete();
-						});
-
+					download(a.proxyURL, fname, (resp) => {
+						message.channel.send(uploadMessage, {files: [`./${fname}`]})
+							.then(() => {
+								fs.unlink(fname, () => { 
+									logger.info(`Deleted ${fname}`)
+								});
+							});
+						message.delete();
 					});
+
 				}
 
 
