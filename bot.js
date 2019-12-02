@@ -16,7 +16,6 @@ logger.add(new logger.transports.Console, {
 logger.level = 'debug';
 
 // Stuff for downloading
-//let request = require(`request`);
 function download(url, name, successCallback){
 
     rp.get(url)
@@ -39,6 +38,11 @@ function safelyDeleteFile(fname) {
 		logger.error(`Failed to delete ${fname}`);
 	}
 }
+
+// Misc functions
+function random(mn, mx) {  
+	return Math.random() * (mx - mn) + mn;  
+}  
 
 // Configure bot
 const bot = new Discord.Client();
@@ -73,35 +77,64 @@ bot.on("message", async message => {
 				message.channel.send("Honk!");
             	break;
 
+			case 'secret':
+				message.author.createDM()
+					.then((newChannel) => {
+						newChannel.send("Test");
+					});
+				break;
+
+			case 'snom':
+				const snomUploadMessages = ["Alexa's adorable Snom", "Alexa's Snom :extraLove:", "Alexa's lil' Snom", "Alexa's Snom loves uwu"];
+				let uploadMessage =
+					snomUploadMessages[Math.floor(Math.random() * snomUploadMessages.length)]
+					+ " (Minor Pokemon Sword/Shield spoiler)";
+
+				message.channel.send(uploadMessage, {files: [`./snom/SPOILER_snom1.gif`]})
+					.then(() => {
+						logger.info(`Uploaded ${fname}`);
+					})
+					.catch((ex) => {
+						logger.error(ex);
+						logger.error("Upload failed!");
+					});
+				break;
+
 			case 'cw':
 			case 'spoil':
 				logger.info(' ');
 				logger.info(`${fullAuthor} has made a request`);
+				logger.info(`${fullAuthor}'s message was '${message.content}'`);
 
 				if(message.attachments.array().length === 0) {
-					message.channel.send(
-						"Attach something to your message, " +
-						"and then I'll reupload it as a spoiler. " +
-						"Also please let everyone know why it's a spoiler " +
-						"by providing a brief explanation with your image. " +
-						"If you are trying to post a text spoiler, " +
-						"please wrap it in vertical bars.\n\n" +
+					message.author.createDM()
+						.then((newChannel) => {
+							newChannel.send(
+								"Attach something to your message, " +
+								"and then I'll reupload it as a spoiler. " +
+								"Also please let everyone know why it's a spoiler " +
+								"by providing a brief explanation with your image. " +
+								"If you are trying to post a text spoiler, " +
+								"please wrap it in vertical bars.\n\n" +
 
-						"For example, `||spoiler text||`, yields ||spoiler text||."
-					);
+								"For example, `||spoiler text||`, yields ||spoiler text||."
+							);
+						});
 
 					logger.info(`${fullAuthor} printed out usage information`);
-					logger.info(`${fullAuthor}'s message was '${message.content}'`);
 
 					message.delete();
 					logger.info(`Deleted original message`);
 				}
 				else if(message.attachments.array().length > 1) {
-					message.channel.send(
-						"I can only handle one attachment at a time! " +
-						"(Sorry for the hassle. If you want this changed, " +
-						`let my programmer, <@${authorID}>, know.)`
-					);
+					message.author.createDM()
+						.then((newChannel) => {
+							newChannel.send(
+								"I can only handle one attachment at a time! " +
+								"(Sorry for the hassle. If you want this changed, " +
+								`let my programmer, <@${authorID}>, know.)`
+							);
+						});
 
 					logger.info(`${fullAuthor} uploaded too many attachments`);
 
