@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 var logger = require('winston');
-var auth = require('./auth.json');
+//var auth = require('./auth.json');
+var discordToken = process.env.DISCORD_TOKEN;
 var rp = require('request-promise');
 var fs = require(`fs`);
 
@@ -203,4 +204,5 @@ bot.on("message", async message => {
 	} // if(message.content.substring(0, 1) == '!')
 }); // bot.on("message", ...
 
-bot.login(auth.token);
+//logger.info(process.env);
+bot.login(discordToken);
