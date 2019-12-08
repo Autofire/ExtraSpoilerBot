@@ -5,11 +5,33 @@
   "main": "bot.js",
   "author": "Autofire",
   "license": "GPL-3.0",
+
+  "engines": {
+    "node": "8.x",
+	"npm": "3.x"
+  },
+
   "dependencies": {
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "discord.js": "^11.5.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "winston": "^3.2.1"
-  }
+  },
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node bot.js"
+  },
+
+  "repository": {
+    "type": "git",
+	"url": "git+https://github.com/Autofire/ExtraSpoilerBot.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/Autofire/ExtraSpoilerBot/issues"
+  },
+
+  "homepage": "https://github.com/Autofire/ExtraSpoilerBot/blob/master/README.md"
 }
