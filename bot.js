@@ -103,6 +103,7 @@ bot.on("message", async message => {
 
 			case 'cw':
 			case 'spoil':
+			case 'spoiler':
 				logger.info(' ');
 				logger.info(`${fullAuthor} has made a request`);
 				logger.info(`${fullAuthor}'s message was '${message.content}'`);
@@ -145,13 +146,13 @@ bot.on("message", async message => {
 				else {
 
 					let uploadMessage = '';
-					if(cmd === 'spoil') {
-						uploadMessage = `<@${message.author.id}> posts a spoiler: ${description}`;
-					}
-					else {
+					if(cmd === 'cw') {
 						uploadMessage =
 							`<@${message.author.id}> posts something ` +
 							`with a content warning: ${description}`;
+					}
+					else {
+						uploadMessage = `<@${message.author.id}> posts a spoiler: ${description}`;
 					}
 
 					let a = message.attachments.first();
