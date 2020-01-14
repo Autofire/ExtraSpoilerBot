@@ -88,8 +88,7 @@ bot.on("message", async message => {
 			case 'snom':
 				const snomUploadMessages = ["Alexa's adorable Snom", "Alexa's Snom", "Alexa's lil' Snom", "Alexa's Snom loves uwu"];
 				let uploadMessage =
-					snomUploadMessages[Math.floor(Math.random() * snomUploadMessages.length)]
-					+ " (Minor Pokemon Sword/Shield spoiler)";
+					snomUploadMessages[Math.floor(Math.random() * snomUploadMessages.length)];
 
 				message.channel.send(uploadMessage, {files: [`./snom/snom1.gif`]})
 					.then(() => {
