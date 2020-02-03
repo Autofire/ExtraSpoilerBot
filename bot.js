@@ -155,7 +155,7 @@ bot.on("message", async message => {
 					}
 
 					let a = message.attachments.first();
-					let fname = `${tmpDir}/SPOILER_${a.filename}`;
+					let fname = `${tmpDir}/SPOILER_${a.id}_${a.filename}`;
 
 					logger.info(`${fullAuthor} has sent in a file: `);
 					logger.info(` id: ${a.id}`);
