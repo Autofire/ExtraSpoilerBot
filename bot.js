@@ -74,6 +74,10 @@ bot.on("message", async message => {
         args = args.splice(1);
         switch(cmd) {
             // !ping
+			case 'rae':
+				message.channel.send("???");
+				break;
+				
             case 'goose':
 				message.channel.send("Honk!");
             	break;
